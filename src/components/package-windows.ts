@@ -1,10 +1,13 @@
 import { LitElement, html, css } from "lit";
-import { customElement } from "lit/decorators.js";
+import { customElement, state } from "lit/decorators.js";
 import { windowsEndpoint } from "../endpoints";
+import { getManifestUrl } from "../extensionHelpers";
 import { WindowsOptions } from "../interfaces";
 
 @customElement("package-windows")
 export class PackageWindows extends LitElement {
+  @state() currentManiUrl: string | undefined = undefined;
+
   static styles = [
     css`
       :host {
@@ -13,7 +16,15 @@ export class PackageWindows extends LitElement {
     `,
   ];
 
-  async packageForWindows(options: any) {
+  public async firstUpdated() {
+    this.currentManiUrl= await getManifestUrl();
+
+    if (this.currentManiUrl) {
+        
+    }
+  }
+
+  private async packageForWindows(options: any) {
     let response: Response | undefined;
 
     try {
@@ -29,7 +40,7 @@ export class PackageWindows extends LitElement {
     return response;
   }
 
-  setUpOptions(
+  private setUpOptions(
     url: string,
     name: string,
     packageId: string,
@@ -57,6 +68,10 @@ export class PackageWindows extends LitElement {
   }
 
   render() {
-    return html` <h1>Package for The Microsoft Store</h1> `;
+    return html`
+      <h1>Package for The Microsoft Store</h1>
+
+      <form></form>
+    `;
   }
 }

@@ -1,6 +1,7 @@
 import { LitElement, html } from "lit";
 import {customElement, state} from 'lit/decorators.js';
 import { getManifestUrl } from "../extensionHelpers";
+import { fetchManifest } from "../manifest-utils";
 
 @customElement("pwa-scanner")
 export class PWAScanner extends LitElement {
@@ -23,10 +24,4 @@ export class PWAScanner extends LitElement {
   render() {
     return html` <div>Current Url = ${this.currentUrl}</div> `;
   }
-}
-
-async function fetchManifest(manifestUri: string) {
-  const response = await fetch(manifestUri);
-  const json = await response.json();
-  return json;
 }
