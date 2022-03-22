@@ -1,0 +1,1 @@
+export const windowsEndpoint = "https://pwabuilder-winserver.centralus.cloudapp.azure.com/msix/generatezip";
