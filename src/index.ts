@@ -1,7 +1,7 @@
 import { LitElement, html } from "lit";
 import {customElement} from 'lit/decorators.js';
-
 import './components/scanner';
+
 @customElement("pwa-extension")
 export class PwaExtension extends LitElement {
 
