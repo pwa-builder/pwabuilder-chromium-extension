@@ -1,4 +1,4 @@
-chrome.devtools.panels.create("Hello World",
+chrome.devtools.panels.create("PWA Builder",
             "icon_512.png",
             "panel.html",
             (panel) => {
