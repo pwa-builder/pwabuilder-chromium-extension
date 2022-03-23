@@ -4,7 +4,7 @@ import { IconInfo } from "../interfaces/IconInfo";
 import { Manifest, ManifestContext, TestResult } from "../interfaces/manifest";
 
 export async function fetchManifest(manifestUri: string) : Promise<Manifest> {
-  const response = await fetch(manifestUri);
+  const response = await fetch(manifestUri, { credentials: "include" });
   const json = await response.json();
   return json;
 }

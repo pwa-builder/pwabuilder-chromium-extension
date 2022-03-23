@@ -11,7 +11,7 @@ import "@lottiefiles/lottie-player";
 import "@shoelace-style/shoelace/dist/components/progress-ring/progress-ring";
 import "@shoelace-style/shoelace/dist/components/badge/badge";
 
-import { getManifestUrl } from "../extensionHelpers";
+import { getManifestUrl, getServiceWorker } from "../extensionHelpers";
 import { fetchManifest, runManifestChecks } from "../utils/manifest";
 import { TestResult } from "../interfaces/manifest";
 
@@ -88,6 +88,8 @@ export class PWAScanner extends LitElement {
     });
 
     console.log(this.testResults);
+
+    console.log(await getServiceWorker());
   }
 
   render() {
