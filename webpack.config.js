@@ -26,7 +26,14 @@ module.exports = {
   },
   plugins: [
     new CopyPlugin({
-      patterns: [{ from: ".", to: ".", context: "public" }],
+      patterns: [
+        { from: ".", to: ".", context: "public" },
+        {
+          from: "*.css",
+          to: "shoelace/",
+          context: "node_modules/@shoelace-style/shoelace/dist/themes/"
+        },
+      ],
     }),
   ],
   watch: true,

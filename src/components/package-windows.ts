@@ -2,8 +2,8 @@ import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { windowsEndpoint } from "../endpoints";
 import { getManifestUrl } from "../extensionHelpers";
-import { WindowsOptions } from "../interfaces";
-import { fetchManifest } from "../manifest-utils";
+import { WindowsOptions } from "../interfaces/windowsOptions";
+import { fetchManifest } from "../utils/manifest";
 
 @customElement("package-windows")
 export class PackageWindows extends LitElement {
@@ -35,7 +35,7 @@ export class PackageWindows extends LitElement {
         // set options we can find in manifest
         this.setUpOptions(
           this.currentUrl,
-          manifest.name,
+          manifest.name || manifest.short_name || "My App",
           "",
           "",
           "",
@@ -47,7 +47,7 @@ export class PackageWindows extends LitElement {
     }
   }
 
-  private async packageForWindows(options: any) {
+  private async packageForWindows(options: any): Promise<Response | undefined> {
     let response: Response | undefined;
 
     try {
@@ -57,7 +57,7 @@ export class PackageWindows extends LitElement {
         headers: new Headers({ "content-type": "application/json" }),
       });
     } catch (err) {
-      return err;
+      console.error(err);
     }
 
     return response;
@@ -127,13 +127,23 @@ export class PackageWindows extends LitElement {
           }
         }
 
-        console.log("about to send options", this.windowsOptions);
-
         // we now have all options, lets try to generate a package
         const response = await this.packageForWindows(this.windowsOptions);
         if (response) {
-          console.log(response);
+          const data = await response.blob();
+          const url = URL.createObjectURL(data);
+
+          // var blob = new Blob(["text" + "file"], {type: "application/octet-stream"});
+          // var url = URL.createObjectURL(blob);
+
+          // download the package
+          await chrome.downloads.download({
+            url,
+            filename: `${this.windowsOptions.packageId}.zip`,
+            saveAs: true,
+          });
         }
+
       }
     }
   }
