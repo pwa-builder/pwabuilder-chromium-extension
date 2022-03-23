@@ -2,7 +2,7 @@ import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { windowsEndpoint } from "../endpoints";
 import { getManifestUrl } from "../extensionHelpers";
-import { WindowsOptions } from "../interfaces";
+import { WindowsOptions } from "../interfaces/windowsOptions";
 
 @customElement("package-windows")
 export class PackageWindows extends LitElement {
