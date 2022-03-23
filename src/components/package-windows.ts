@@ -47,7 +47,7 @@ export class PackageWindows extends LitElement {
     }
   }
 
-  private async packageForWindows(options: any) {
+  private async packageForWindows(options: any): Promise<Response | undefined> {
     let response: Response | undefined;
 
     try {
@@ -57,7 +57,7 @@ export class PackageWindows extends LitElement {
         headers: new Headers({ "content-type": "application/json" }),
       });
     } catch (err) {
-      return err;
+      console.error(err);
     }
 
     return response;
@@ -130,8 +130,20 @@ export class PackageWindows extends LitElement {
         // we now have all options, lets try to generate a package
         const response = await this.packageForWindows(this.windowsOptions);
         if (response) {
-          console.log(response);
+          const data = await response.blob();
+          const url = URL.createObjectURL(data);
+
+          // var blob = new Blob(["text" + "file"], {type: "application/octet-stream"});
+          // var url = URL.createObjectURL(blob);
+
+          // download the package
+          await chrome.downloads.download({
+            url,
+            filename: `${this.windowsOptions.packageId}.zip`,
+            saveAs: true,
+          });
         }
+
       }
     }
   }

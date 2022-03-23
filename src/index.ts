@@ -22,7 +22,6 @@ export class PwaExtension extends LitElement {
 
   render() {
     return html`
-<<<<<<< HEAD
     <fluent-tabs>
       <fluent-tab id="validate">Validate</fluent-tab>
       <fluent-tab id="manifest">Manifest</fluent-tab>
@@ -37,15 +36,9 @@ export class PwaExtension extends LitElement {
       </fluent-tab-panel>
 
       <fluent-tab-panel id="validatePanel">
-        Package
+        <package-windows></package-windows>
       </fluent-tab-panel>
     </fluent-tabs>
-=======
-      <h1>PWA Builder Extension</h1>
-      <pwa-scanner></pwa-scanner>
-
-      <package-windows></package-windows>
->>>>>>> package-windows
     `
     ;
   }
