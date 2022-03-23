@@ -2,7 +2,7 @@ import { LitElement, html } from "lit";
 import {customElement} from 'lit/decorators.js';
 import './components/scanner';
 import './components/package-windows';
-import './components/manifest-validator';
+import './components/manifest-designer';
 
 import {
   provideFluentDesignSystem,
@@ -33,7 +33,7 @@ export class PwaExtension extends LitElement {
       </fluent-tab-panel>
 
       <fluent-tab-panel id="validatePanel">
-        Manifest Editor
+        <manifest-designer></manifest-designer>
       </fluent-tab-panel>
 
       <fluent-tab-panel id="validatePanel">
