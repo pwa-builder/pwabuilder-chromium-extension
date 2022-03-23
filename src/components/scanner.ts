@@ -8,17 +8,13 @@ export class PWAScanner extends LitElement {
 
   @state()
   private currentUrl!: string;
+  private manifest!: any;
 
   async firstUpdated() {
     let url = await chrome.tabs.query({ active: true, currentWindow: true });
     if (url.length > 0) {
       this.currentUrl = url[0].url || "";
     }
-
-    const manifestUri = await getManifestUrl();
-    console.log(manifestUri);
-    console.log(await fetchManifest(manifestUri!));
-    
   }
   
   render() {
