@@ -5,6 +5,14 @@ import { getManifestUrl } from "../extensionHelpers";
 import { WindowsOptions } from "../interfaces/windowsOptions";
 import { fetchManifest } from "../utils/manifest";
 
+import {
+  provideFluentDesignSystem,
+  fluentTextField,
+  fluentButton
+} from "@fluentui/web-components";
+
+provideFluentDesignSystem().register(fluentTextField(), fluentButton());
+
 @customElement("package-windows")
 export class PackageWindows extends LitElement {
   @state() currentManiUrl: string | undefined = undefined;
@@ -15,6 +23,21 @@ export class PackageWindows extends LitElement {
     css`
       :host {
         display: block;
+      }
+
+      form {
+        display: grid;
+        gap: 15px;
+      }
+
+      label {
+        display: flex;
+        flex-direction: column;
+      }
+
+      form fluent-button {
+        width: 8em;
+        justify-self: flex-end;
       }
     `,
   ];
@@ -143,7 +166,6 @@ export class PackageWindows extends LitElement {
             saveAs: true,
           });
         }
-
       }
     }
   }
@@ -154,47 +176,52 @@ export class PackageWindows extends LitElement {
 
       <form @submit="${($event: SubmitEvent) => this.handleSubmit($event)}">
         <!-- label for packageId input -->
-        <label for="packageId">Package Id</label>
-        <input
+        <label for="packageId">Package Id
+        <fluent-text-field
           type="text"
           id="packageId"
           name="packageId"
           placeholder="Package Id"
-        />
+        ></fluent-text-field>
+        </label>
 
         <!-- label for version input -->
-        <label for="version">Version</label>
-        <input type="text" id="version" name="version" placeholder="Version" />
+        <label for="version">Version
+        <fluent-text-field type="text" id="version" name="version" placeholder="Version"></fluent-text-field>
+        </label>
 
         <!-- label for classicVersion input -->
-        <label for="classicVersion">Classic Version</label>
-        <input
-          type="text"
-          id="classicVersion"
-          name="classicVersion"
-          placeholder="Classic Version"
-        />
+        <label for="classicVersion">Classic Version
+          <fluent-text-field
+            type="text"
+            id="classicVersion"
+            name="classicVersion"
+            placeholder="Classic Version"
+          ></fluent-text-field>
+        </label>
 
         <!-- label for publisherDisplayName input -->
-        <label for="publisherDisplayName">Publisher Display Name</label>
-        <input
+        <label for="publisherDisplayName">Publisher Display Name
+        <fluent-text-field
           type="text"
           id="publisherDisplayName"
           name="publisherDisplayName"
           placeholder="Publisher Display Name"
-        />
+        ></fluent-text-field>
+        </label>
 
         <!-- label for publisherCommonName input -->
-        <label for="publisherCommonName">Publisher Common Name</label>
-        <input
+        <label for="publisherCommonName">Publisher Common Name
+        <fluent-text-field
           type="text"
           id="publisherCommonName"
           name="publisherCommonName"
           placeholder="Publisher Common Name"
-        />
+        ></fluent-text-field>
+        </label>
 
         <!-- submit button -->
-        <input type="submit" value="Send" />
+        <fluent-button type="submit">Generate</fluent-button>
       </form>
     `;
   }
