@@ -1,8 +1,13 @@
 export interface Manifest {
   background_color?: string;
+  categories?: string[];
   description?: string;
   dir?: "auto" | "ltr" | "rtl" | string;
-  display?: string;
+  display?: "fullscreen" | "standalone" | "minimal-ui" | "browser";
+  display_override?: "fullscreen" | "standalone" | "minimal-ui" | "browser" | "window-controls-overlay";
+  iarc_rating_id?: string;
+  iconBlobUrls?: string[];
+  icons?: Icon[];
   lang?: string | undefined;
   name?: string | undefined;
   orientation?:
@@ -15,24 +20,26 @@ export interface Manifest {
     | "landscape-primary"
     | "landscape-secondary";
   prefer_related_applications?: boolean;
+  protocol_handlers?: ProtocolHandler[];
   related_applications?: RelatedApplication[];
   scope?: string;
+  screenshots?: Screenshot[];
+  share_target?: ShareTarget;
   short_name?: string;
+  shortcuts?: ShortcutItem[];
   start_url?: string;
   theme_color?: string;
   generated?: boolean;
-  shortcuts?: ShortcutItem[];
-  categories?: string[];
-  screenshots?: Screenshot[];
-  iarc_rating_id?: string;
-  iconBlobUrls?: string[];
-  icons?: Icon[];
-  share_target?: ShareTarget;
 
   // for custom properties as well as using object notations: manifest[key]
   // eslint-disable-next-line @typescript-eslint/ban-ts-comment
   // @ts-ignore - accomodate custom entries... these can be a pain
   [key: string]: string | boolean | undefined | Array<any> | any;
+}
+
+export interface ProtocolHandler {
+  protocol: string;
+  url: string;
 }
 
 export interface ShortcutItem {
