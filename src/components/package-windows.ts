@@ -82,7 +82,7 @@ export class PackageWindows extends LitElement {
     try {
       response = await fetch(windowsEndpoint, {
         method: "POST",
-        body: options,
+        body: JSON.stringify(options),
         headers: new Headers({ "content-type": "application/json" }),
       });
     } catch (err) {
