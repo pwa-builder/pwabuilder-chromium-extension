@@ -2,6 +2,7 @@ import { LitElement, html } from "lit";
 import {customElement} from 'lit/decorators.js';
 import './components/scanner';
 import './components/package-windows';
+import './components/manifest-designer';
 
 import {
   provideFluentDesignSystem,
@@ -22,6 +23,7 @@ export class PwaExtension extends LitElement {
 
   render() {
     return html`
+<<<<<<< HEAD
     <fluent-tabs>
       <fluent-tab id="validate">Validate</fluent-tab>
       <fluent-tab id="manifest">Manifest</fluent-tab>
@@ -32,13 +34,19 @@ export class PwaExtension extends LitElement {
       </fluent-tab-panel>
 
       <fluent-tab-panel id="validatePanel">
-        Manifest Editor
+        <manifest-designer></manifest-designer>
       </fluent-tab-panel>
 
       <fluent-tab-panel id="validatePanel">
         Package
       </fluent-tab-panel>
     </fluent-tabs>
+=======
+      <h1>PWA Builder Extension</h1>
+      <pwa-scanner></pwa-scanner>
+
+      <package-windows></package-windows>
+>>>>>>> package-windows
     `
     ;
   }
