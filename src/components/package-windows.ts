@@ -28,7 +28,7 @@ export class PackageWindows extends LitElement {
 
       form {
         display: grid;
-        gap: 15px;
+        gap: 10px;
       }
 
       label {
