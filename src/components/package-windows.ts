@@ -8,7 +8,7 @@ import { fetchManifest } from "../utils/manifest";
 import {
   provideFluentDesignSystem,
   fluentTextField,
-  fluentButton
+  fluentButton,
 } from "@fluentui/web-components";
 
 provideFluentDesignSystem().register(fluentTextField(), fluentButton());
@@ -176,52 +176,85 @@ export class PackageWindows extends LitElement {
 
       <form @submit="${($event: SubmitEvent) => this.handleSubmit($event)}">
         <!-- label for packageId input -->
-        <label for="packageId">Package Id
-        <fluent-text-field
-          type="text"
-          id="packageId"
-          name="packageId"
-          placeholder="Package Id"
-        ></fluent-text-field>
+        <label for="packageId"
+          >Package Id
+          <fluent-text-field
+            type="text"
+            id="packageId"
+            name="packageId"
+            placeholder="MyCompany.MyApp"
+            required
+            max-length="50"
+            min-length="3"
+            pattern="[a-zA-Z0-9.-]*$"
+          ></fluent-text-field>
         </label>
 
         <!-- label for version input -->
-        <label for="version">Version
-        <fluent-text-field type="text" id="version" name="version" placeholder="Version"></fluent-text-field>
+        <label for="version"
+          >Version
+          <fluent-text-field
+            type="text"
+            id="version"
+            name="version"
+            required
+            min-length="5"
+            placeholder="1.0.1"
+            spellcheck="false"
+            pattern="^[^0]+\\d*.\\d+.\\d+$"
+          ></fluent-text-field>
         </label>
 
         <!-- label for classicVersion input -->
-        <label for="classicVersion">Classic Version
+        <label for="classicVersion"
+          >Classic Version
           <fluent-text-field
             type="text"
             id="classicVersion"
             name="classicVersion"
-            placeholder="Classic Version"
+            required
+            min-length="5"
+            placeholder="1.0.0"
+            spellcheck="false"
+            pattern="^[^0]+\\d*.\\d+.\\d+$"
           ></fluent-text-field>
         </label>
 
         <!-- label for publisherDisplayName input -->
-        <label for="publisherDisplayName">Publisher Display Name
-        <fluent-text-field
-          type="text"
-          id="publisherDisplayName"
-          name="publisherDisplayName"
-          placeholder="Publisher Display Name"
-        ></fluent-text-field>
+        <label for="publisherDisplayName"
+          >Publisher Display Name
+          <fluent-text-field
+            type="text"
+            id="publisherDisplayName"
+            name="publisherDisplayName"
+            placeholder="Contoso Inc."
+            required
+            min-length="3"
+            spellcheck="false"
+          ></fluent-text-field>
         </label>
 
         <!-- label for publisherCommonName input -->
-        <label for="publisherCommonName">Publisher Common Name
-        <fluent-text-field
-          type="text"
-          id="publisherCommonName"
-          name="publisherCommonName"
-          placeholder="Publisher Common Name"
-        ></fluent-text-field>
+        <label for="publisherCommonName"
+          >Publisher Common Name
+          <fluent-text-field
+            type="text"
+            id="publisherCommonName"
+            name="publisherCommonName"
+            placeholder="Publisher Common Name"
+            pattern="CN=.+"
+            required
+            spellcheck="false"
+            ,
+            min-length="4"
+            ,
+          ></fluent-text-field>
         </label>
 
         <!-- submit button -->
-        <fluent-button appearance="accent" type="submit">Generate</fluent-button>
+        <fluent-button appearance="accent" type="submit"
+          >Generate</fluent-button
+        >
       </form>
     `;
   }
