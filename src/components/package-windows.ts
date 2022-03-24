@@ -9,9 +9,10 @@ import {
   provideFluentDesignSystem,
   fluentTextField,
   fluentButton,
+  fluentTooltip
 } from "@fluentui/web-components";
 
-provideFluentDesignSystem().register(fluentTextField(), fluentButton());
+provideFluentDesignSystem().register(fluentTextField(), fluentButton(), fluentTooltip());
 
 @customElement("package-windows")
 export class PackageWindows extends LitElement {
@@ -38,6 +39,11 @@ export class PackageWindows extends LitElement {
       form fluent-button {
         width: 8em;
         justify-self: flex-end;
+      }
+
+      fluent-tooltip p {
+        white-space: pre-wrap;
+        width: 20em;
       }
     `,
   ];
@@ -176,8 +182,13 @@ export class PackageWindows extends LitElement {
 
       <form @submit="${($event: SubmitEvent) => this.handleSubmit($event)}">
         <!-- label for packageId input -->
+        <fluent-tooltip id="tooltip" anchor="packageId">
+          <p>The Package ID uniquely identifying your app in the Microsoft Store. Get this value from Windows Partner Center.</p>
+        </fluent-tooltip>
+
         <label for="packageId"
           >Package Id
+
           <fluent-text-field
             type="text"
             id="packageId"
@@ -190,7 +201,48 @@ export class PackageWindows extends LitElement {
           ></fluent-text-field>
         </label>
 
+        <!-- label for publisherDisplayName input -->
+        <fluent-tooltip id="tooltip" anchor="publisherDisplayName">
+          <p>The display name of your app's publisher. Get this value from Windows Partner Center.</p>
+        </fluent-tooltip>
+        <label for="publisherDisplayName"
+          >Publisher Display Name
+          <fluent-text-field
+            type="text"
+            id="publisherDisplayName"
+            name="publisherDisplayName"
+            placeholder="Contoso Inc."
+            required
+            min-length="3"
+            spellcheck="false"
+          ></fluent-text-field>
+        </label>
+
+        <!-- label for publisherCommonName input -->
+        <fluent-tooltip id="tooltip" anchor="publisherCommonName">
+          <p>The ID of your app's publisher. Get this value from Windows Partner Center.</p>
+        </fluent-tooltip>
+        <label for="publisherCommonName"
+          >Publisher Common Name
+          <fluent-text-field
+            type="text"
+            id="publisherCommonName"
+            name="publisherCommonName"
+            placeholder="Publisher Common Name"
+            pattern="CN=.+"
+            required
+            spellcheck="false"
+            ,
+            min-length="4"
+            ,
+          ></fluent-text-field>
+        </label>
+
         <!-- label for version input -->
+        <fluent-tooltip id="tooltip" anchor="version">
+          <p>Your app version in the form of '1.0.0'. It must not start with zero and must be greater than classic package version. For new apps, this should be set to 1.0.1</p>
+        </fluent-tooltip>
+
         <label for="version"
           >Version
           <fluent-text-field
@@ -206,6 +258,9 @@ export class PackageWindows extends LitElement {
         </label>
 
         <!-- label for classicVersion input -->
+        <fluent-tooltip id="tooltip" anchor="classicVersion">
+          <p>The version of your app that runs on older versions of Windows. Must be in the form of '1.0.0', it cannot start with zero, and must be less than app version. For new apps, this should be set to 1.0.0</p>
+        </fluent-tooltip>
         <label for="classicVersion"
           >Classic Version
           <fluent-text-field
@@ -217,37 +272,6 @@ export class PackageWindows extends LitElement {
             placeholder="1.0.0"
             spellcheck="false"
             pattern="^[^0]+\\d*.\\d+.\\d+$"
-          ></fluent-text-field>
-        </label>
-
-        <!-- label for publisherDisplayName input -->
-        <label for="publisherDisplayName"
-          >Publisher Display Name
-          <fluent-text-field
-            type="text"
-            id="publisherDisplayName"
-            name="publisherDisplayName"
-            placeholder="Contoso Inc."
-            required
-            min-length="3"
-            spellcheck="false"
-          ></fluent-text-field>
-        </label>
-
-        <!-- label for publisherCommonName input -->
-        <label for="publisherCommonName"
-          >Publisher Common Name
-          <fluent-text-field
-            type="text"
-            id="publisherCommonName"
-            name="publisherCommonName"
-            placeholder="Publisher Common Name"
-            pattern="CN=.+"
-            required
-            spellcheck="false"
-            ,
-            min-length="4"
-            ,
           ></fluent-text-field>
         </label>
 
