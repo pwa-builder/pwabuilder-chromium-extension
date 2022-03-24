@@ -1,9 +1,8 @@
 import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { windowsEndpoint } from "../endpoints";
-import { getManifestUrl } from "../extensionHelpers";
+import { getSiteInfo } from "../extensionHelpers";
 import { WindowsOptions } from "../interfaces/windowsOptions";
-import { fetchManifest } from "../utils/manifest";
 
 @customElement("package-windows")
 export class PackageWindows extends LitElement {
@@ -20,10 +19,11 @@ export class PackageWindows extends LitElement {
   ];
 
   public async firstUpdated() {
-    this.currentManiUrl = await getManifestUrl();
-
-    if (this.currentManiUrl) {
-      const manifest = await fetchManifest(this.currentManiUrl);
+    const siteInfo = await getSiteInfo();
+        
+    if (siteInfo && siteInfo.manifest) {
+      this.currentManiUrl = siteInfo.manifest.manifestUri;
+      const manifest = siteInfo.manifest.manifest;
 
       // get current url
       let url = await chrome.tabs.query({ active: true, currentWindow: true });

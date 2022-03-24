@@ -1,8 +1,7 @@
 import { LitElement, html } from "lit";
 import {customElement, state} from 'lit/decorators.js';
-import { getManifestUrl } from "../extensionHelpers";
+import { getSiteInfo } from "../extensionHelpers";
 import { Manifest } from "../interfaces/manifest";
-import { fetchManifest } from "../utils/manifest";
 
 import {
   provideFluentDesignSystem,
@@ -123,10 +122,9 @@ export class ManifestDesigner extends LitElement {
   private manifest!: Manifest;
 
   async firstUpdated() {
-    const manifestUri = await getManifestUrl();
-    const manifest = await fetchManifest(manifestUri!);
-    if (manifest) {
-        this.manifest = manifest;
+    const siteInfo = await getSiteInfo();
+    if (siteInfo && siteInfo.manifest && siteInfo.manifest.manifest) {
+        this.manifest = siteInfo.manifest.manifest;
     }
     
     console.log('manifest', this.manifest);

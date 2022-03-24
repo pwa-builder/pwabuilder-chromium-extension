@@ -11,8 +11,8 @@ import "@lottiefiles/lottie-player";
 import "@shoelace-style/shoelace/dist/components/progress-ring/progress-ring";
 import "@shoelace-style/shoelace/dist/components/badge/badge";
 
-import { getManifestUrl, getServiceWorker } from "../extensionHelpers";
-import { fetchManifest, runManifestChecks } from "../utils/manifest";
+import { getSiteInfo } from "../extensionHelpers";
+import { runManifestChecks } from "../utils/manifest";
 import { TestResult } from "../interfaces/manifest";
 
 provideFluentDesignSystem().register(
@@ -73,23 +73,18 @@ export class PWAScanner extends LitElement {
       this.currentUrl = url[0].url || "";
     }
 
-    const manifestUri = await getManifestUrl();
-    const manifest = await fetchManifest(manifestUri!);
-
-    console.log(manifestUri, manifest);
+    const siteInfo = await getSiteInfo();
 
     this.testResults = await runManifestChecks({
-      manifestUrl: manifestUri!,
-      initialManifest: manifest,
+      manifestUrl: siteInfo.manifest.manifestUri,
+      initialManifest: siteInfo.manifest.manifest,
       siteUrl: this.currentUrl,
       isGenerated: false,
       isEdited: false,
-      manifest,
+      manifest: siteInfo.manifest.manifest,
     });
 
     console.log(this.testResults);
-
-    console.log(await getServiceWorker());
   }
 
   render() {
