@@ -221,7 +221,7 @@ export class PackageWindows extends LitElement {
         </label>
 
         <!-- submit button -->
-        <fluent-button type="submit">Generate</fluent-button>
+        <fluent-button appearance="accent" type="submit">Generate</fluent-button>
       </form>
     `;
   }
