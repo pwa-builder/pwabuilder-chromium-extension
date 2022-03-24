@@ -63,7 +63,6 @@ export class PWAScanner extends LitElement {
 
   @state()
   private currentUrl!: string;
-  private manifest!: any;
 
   @state()
   private testResults!: TestResult[];
