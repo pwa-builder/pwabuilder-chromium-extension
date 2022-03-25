@@ -1,7 +1,6 @@
 import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { windowsEndpoint } from "../endpoints";
-import { getSiteInfo } from "../extensionHelpers";
 import { WindowsOptions } from "../interfaces/windowsOptions";
 
 import {
@@ -11,6 +10,7 @@ import {
   fluentTooltip,
   fluentAnchor,
 } from "@fluentui/web-components";
+import { getManifestInfo } from "../checks/manifest";
 
 provideFluentDesignSystem().register(
   fluentTextField(),
@@ -60,11 +60,11 @@ export class PackageWindows extends LitElement {
   ];
 
   public async firstUpdated() {
-    const siteInfo = await getSiteInfo();
+    const manifestInfo = await getManifestInfo();
         
-    if (siteInfo && siteInfo.manifest) {
-      this.currentManiUrl = siteInfo.manifest.manifestUri;
-      const manifest = siteInfo.manifest.manifest;
+    if (manifestInfo) {
+      this.currentManiUrl = manifestInfo.manifestUri;
+      const manifest = manifestInfo.manifest;
 
       // get current url
       let url = await chrome.tabs.query({ active: true, currentWindow: true });

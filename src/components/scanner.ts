@@ -11,9 +11,11 @@ import "@lottiefiles/lottie-player";
 import "@shoelace-style/shoelace/dist/components/progress-ring/progress-ring";
 import "@shoelace-style/shoelace/dist/components/badge/badge";
 
-import { getSiteInfo } from "../extensionHelpers";
 import { runManifestChecks } from "../utils/manifest";
 import { TestResult } from "../interfaces/manifest";
+import { testSecurity } from "../checks/security";
+import { getSwInfo } from "../checks/sw";
+import { getManifestInfo } from "../checks/manifest";
 
 provideFluentDesignSystem().register(
   fluentButton(),
@@ -73,18 +75,29 @@ export class PWAScanner extends LitElement {
       this.currentUrl = url[0].url || "";
     }
 
-    const siteInfo = await getSiteInfo();
+    console.log("fetching site info");
+    // const siteInfo = await getSiteInfo();
+    // console.log(siteInfo);
 
-    this.testResults = await runManifestChecks({
-      manifestUrl: siteInfo.manifest.manifestUri,
-      initialManifest: siteInfo.manifest.manifest,
-      siteUrl: this.currentUrl,
-      isGenerated: false,
-      isEdited: false,
-      manifest: siteInfo.manifest.manifest,
-    });
+    // this.testResults = await runManifestChecks({
+    //   manifestUrl: siteInfo.manifest.manifestUri!,
+    //   initialManifest: siteInfo.manifest.manifest!,
+    //   siteUrl: this.currentUrl,
+    //   isGenerated: false,
+    //   isEdited: false,
+    //   manifest: siteInfo.manifest.manifest!,
+    // });
 
-    console.log(this.testResults);
+    // if (siteInfo.sw.hasSW) {
+    //   console.log('service worker tests', analyzeSW(siteInfo.sw.rawSW!))
+    // }
+
+    // console.log('manifest tests', this.testResults);
+
+    console.log("manifest", await getManifestInfo());
+    console.log("sw", await getSwInfo());
+    console.log('security', await testSecurity(this.currentUrl));
+
   }
 
   render() {

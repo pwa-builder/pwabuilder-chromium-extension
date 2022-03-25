@@ -1,18 +1,22 @@
 import { Manifest } from "./manifest";
 
 export interface ManifestDetectionResult {
-    manifest: Manifest,
-    manifestUri: string
+    hasManifest: boolean;
+    manifest?: Manifest,
+    manifestUri?: string
 }
 
 export interface ServiceWorkerDetectionResult {
     hasSW: boolean;
-    url: string | null;
-    hasPushRegistration: boolean;
-    serviceWorkerDetectionTimedOut: boolean;
-    noServiceWorkerFoundDetails: string | null;
-    hasBackgroundSync: boolean;
-    hasPeriodicBackgroundSync: boolean;
+    rawSW?: string;
+    url?: string | null;
+    scope?: string | null;
+    hasPushRegistration?: boolean;
+    serviceWorkerDetectionTimedOut?: boolean;
+    noServiceWorkerFoundDetails?: string | null;
+    hasBackgroundSync?: boolean;
+    hasPeriodicBackgroundSync?: boolean;
+    isHtmlInCache?: boolean;
 }
 
 export interface SecurityDataResults {
