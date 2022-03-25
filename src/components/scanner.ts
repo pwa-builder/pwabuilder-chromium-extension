@@ -76,28 +76,23 @@ export class PWAScanner extends LitElement {
     }
 
     console.log("fetching site info");
-    // const siteInfo = await getSiteInfo();
-    // console.log(siteInfo);
 
-    // this.testResults = await runManifestChecks({
-    //   manifestUrl: siteInfo.manifest.manifestUri!,
-    //   initialManifest: siteInfo.manifest.manifest!,
-    //   siteUrl: this.currentUrl,
-    //   isGenerated: false,
-    //   isEdited: false,
-    //   manifest: siteInfo.manifest.manifest!,
-    // });
+    let manifestInfo = await getManifestInfo();
+    let swInfo = await getSwInfo();
+    let securityInfo = await testSecurity(this.currentUrl);
 
-    // if (siteInfo.sw.hasSW) {
-    //   console.log('service worker tests', analyzeSW(siteInfo.sw.rawSW!))
-    // }
+    console.log("manifest", manifestInfo);
+    console.log("sw", swInfo);
+    console.log('security', securityInfo);
 
-    // console.log('manifest tests', this.testResults);
-
-    console.log("manifest", await getManifestInfo());
-    console.log("sw", await getSwInfo());
-    console.log('security', await testSecurity(this.currentUrl));
-
+    this.testResults = await runManifestChecks({
+      manifestUrl: manifestInfo.manifestUri!,
+      initialManifest: manifestInfo.manifest!,
+      siteUrl: this.currentUrl,
+      isGenerated: false,
+      isEdited: false,
+      manifest: manifestInfo.manifest!,
+    });
   }
 
   render() {
