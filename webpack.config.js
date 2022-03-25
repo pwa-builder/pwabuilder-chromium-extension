@@ -7,6 +7,7 @@ module.exports = {
     background: path.resolve(__dirname, "src", "background.ts"),
     devtools: path.resolve(__dirname, "src", "devtools.ts"),
     index: path.resolve(__dirname, "src", "index.ts"),
+    partnerCenter: path.resolve(__dirname, "src", "partnerCenter.ts"),
   },
   output: {
     path: path.join(__dirname, "dist"),

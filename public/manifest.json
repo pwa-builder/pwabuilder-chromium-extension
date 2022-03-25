@@ -8,5 +8,11 @@
   },
   "permissions": ["tabs", "scripting", "downloads"],
   "host_permissions": ["http://*/", "https://*/"],
-  "action": {}
+  "action": {},
+  "content_scripts" : [
+    {
+      "js": ["partnerCenter.js"],
+      "matches": ["*://partner.microsoft.com/*"]
+    }
+  ]
 }
