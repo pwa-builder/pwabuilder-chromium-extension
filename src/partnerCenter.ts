@@ -1,49 +1,38 @@
-import { WindowsOptions } from "./interfaces/windowsOptions";
 import * as zip from "@zip.js/zip.js";
+
+import { WindowsOptions } from "./interfaces/windowsOptions";
+
+function log(...args: any[]) {
+    console.log("PWA Builder Extension:", ...args);
+}
 
 async function delay(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-function downloadBlob(blob: Blob, name = 'file.txt') {
+function isValidHttpsUrl(str: string) {
+    let url;
+    
+    try {
+        url = new URL(str);
+    } catch (_) {
+        return false;  
+    }
 
-    // For other browsers:
-    // Create a link pointing to the ObjectURL containing the blob.
-    const data = window.URL.createObjectURL(blob);
-
-    const link = document.createElement('a');
-    link.href = data;
-    link.download = name;
-
-    // this is necessary as link.click() does not work on the latest firefox
-    link.dispatchEvent(
-      new MouseEvent('click', { 
-        bubbles: true, 
-        cancelable: true, 
-        view: window 
-      })
-    );
-
-    setTimeout(() => {
-      // For Firefox it is necessary to delay revoking the ObjectURL
-      window.URL.revokeObjectURL(data);
-      link.remove();
-    }, 100);
+    return url.protocol === "https:";
 }
 
-(async function() {
+async function loadExtension() {
 
-    console.log('Hello from extension');
+    log('Loading extension...');
 
-    // const uploader = document.querySelector('input[type="file"]') as HTMLElement;
-    
     const partnerCenterRegex = /https:\/\/partner\.microsoft\.com\/[\w-]+\/dashboard\/products\/(\w+)\/submissions\/\d+\/packages/g;
     const match = partnerCenterRegex.exec(window.location.href);
     
     if (!match || match.length <= 1) {
+        log('Not on packaging page');
         return;
     }
-    console.log('Extension: we have a match');
     
     let header = document.querySelector('.page-title-header');
     
@@ -57,34 +46,89 @@ function downloadBlob(blob: Blob, name = 'file.txt') {
     let ourForm = document.querySelector("div[data-pwa-form]") as HTMLDivElement;
     const packageName = match[1];   
     
-    
     if (ourForm) {
         return;
     }
-    
     
     ourForm = document.createElement('div');
     ourForm.dataset.pwaForm = 'true';
     
     ourForm.innerHTML = `
-        <label for="url">PWA Url to package</label>
-        <input type="text" name="url"></input>
-        <button>Package PWA</button>
-        `;
+        <style>
+            .pwa-builder-fieldset {
+                display: flex;
+                flex-direction: column;
+                margin-top: 10px;
+            }
+            .pwa-builder-header {
+                margin-top: 10px;
+            }
 
-const button = ourForm.querySelector('button');
-const input = ourForm.querySelector('input') as HTMLInputElement;
-button?.addEventListener('click', async () => {
-    const publisherDataResponse = await fetch("https://partner.microsoft.com/dashboard/packages/api/pkg/v2.0/packageidentities?productbigid=" + packageName);
-    const publisherData = await publisherDataResponse.json();
-    
-    console.log('publisherData', publisherData);
-    
-    let nameList = publisherData.Name.split('.');
-    let name = nameList[nameList.length - 1];
-    
-    const windowsOptions: WindowsOptions = {
-        url: input.value,
+            .pwa-builder-input {
+                margin-bottom: 10px;
+            }
+
+            .pwa-builder-form button {
+                max-width: 250px;
+            }
+
+            .pwa-builder-form input {
+                max-width: 730px;
+            }
+
+            .pwa-builder-hidden {
+                display: none ;
+            }
+        </style>
+        <h4 class="pwa-builder-header">Package a Progressive Web App (PWA)</h4>
+        <div>
+            You can package and upload a PWA directly from here by entering the URL of your app. (ex: https://webboard.app). <a href="https://pwabuilder.com" target="_blank">Learn more</a>
+        </div>
+        <form class="pwa-builder-form" onsubmit="return false;">
+            <fieldset class="pwa-builder-fieldset">
+                <input class="pwa-builder-input" 
+                        type="url" 
+                        name="url" 
+                        pattern="https://.*"
+                        required
+                        placeholder="Enter the URL to your PWA (ex: https://webboard.app)"></input>
+                <button>Package and Upload PWA package</button>
+            </fieldset>
+        </div>
+        <div class="pwa-builder-loading pwa-builder-hidden">
+            This part is hidden
+        </div>
+    `;
+
+    const input = ourForm.querySelector('input') as HTMLInputElement;
+    const loadingDiv = ourForm.querySelector('.pwa-builder-loading');
+    const form = ourForm.querySelector('.pwa-builder-form');
+    const formSet = ourForm.querySelector('.pwa-builder-fieldset') as HTMLFieldSetElement;
+
+
+    form?.addEventListener('submit', async () => {
+        const url = input.value;
+        if (!url || !isValidHttpsUrl(url)) {
+            console.log("url is not a valid https url");
+            return;
+        }
+
+        log('Trying to package', url);
+
+        formSet.disabled = true;
+        loadingDiv!.textContent = "Generating package...";
+        loadingDiv!.classList.remove('pwa-builder-hidden');
+
+        const publisherDataResponse = await fetch("https://partner.microsoft.com/dashboard/packages/api/pkg/v2.0/packageidentities?productbigid=" + packageName);
+        const publisherData = await publisherDataResponse.json();
+        
+        log('Publisher data fetched', publisherData);
+        
+        let nameList = publisherData.Name.split('.');
+        let name = nameList[nameList.length - 1];
+        
+        const windowsOptions: WindowsOptions = {
+            url,
             name,
             packageId: publisherData.Name,
             version: "1.0.0",
@@ -98,7 +142,7 @@ button?.addEventListener('click', async () => {
                 commonName: publisherData.Publisher,
             }
         }
-        
+            
         try {
             const packageResponse = await fetch("https://pwabuilder-winserver.centralus.cloudapp.azure.com/msix/generatezip", {
                 method: "POST",
@@ -106,16 +150,20 @@ button?.addEventListener('click', async () => {
                 headers: new Headers({ "content-type": "application/json" }),
             });
             if (packageResponse) {
+                log('App Packaged and received');
                 const data = await packageResponse.blob();
                 
                 const blobReader = new zip.ZipReader(new zip.BlobReader(data));
                 const entries = await blobReader.getEntries();
-                console.log(entries);
                 
                 if (entries.length > 0) {
+                    log('Package unzipped');
+
                     const uploader = document.querySelector('input[type="file"]') as HTMLInputElement;
                     const bundles = entries.filter(entry => entry.filename.endsWith('.msixbundle'));
                     if (bundles.length > 0) {
+                        log('Found .msixbundle file');
+                        loadingDiv!.textContent = "Uploading package...";
                         const bundle = bundles[0];
                         const bundleBlob: Blob = await (bundle as any).getData(new zip.BlobWriter());
                         
@@ -123,33 +171,30 @@ button?.addEventListener('click', async () => {
                         let container = new DataTransfer();
                         container.items.add(file);
                         uploader.files = container.files;
-                        if (uploader.onchange){
-                            uploader.onchange(new Event('change'));
-                        }
                         uploader.dispatchEvent(new Event('change'));
-                        console.log(uploader.files);
+                        log('File passed to partner center uploader');
                     }
                 }
-                
-                // downloadBlob(data, 'yourpwa.zip');
-                // const url = URL.createObjectURL(data);
-                // console.log("url", url);
-
-                // await chrome.downloads.download({
-                //     url,
-                //     filename: `app.zip`,
-                //     saveAs: true,
-                // });
-                // console.log("done downloading");
-
-                
-
-                // window.location.replace(url)
             }
         } catch (err) {
-            console.error(err);
+            log("Error fetching package from PWA Builder service", err);
         }
+
+        formSet.disabled = false;
+        loadingDiv!.classList.add('pwa-builder-hidden');
     });
 
     header?.appendChild(ourForm);
-})();
+    log('Extension loaded...');
+};
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request && request.urlChanged) {
+        log('navigated to packages page');
+        loadExtension();
+    }
+
+    sendResponse(true);
+});
+
+loadExtension();
