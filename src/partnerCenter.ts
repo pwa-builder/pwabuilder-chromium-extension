@@ -126,6 +126,12 @@ async function loadExtension() {
         
         let nameList = publisherData.Name.split('.');
         let name = nameList[nameList.length - 1];
+
+        // TODO for version
+        // we should provide option for dev to enter version
+        // but we can also be smart and use the partner center api to see what package versions are already submitted 
+        // and generate a new version that's higher
+        // https://partner.microsoft.com/dashboard/packages/api/pkg/v2.0/packagesets?productId=9PGB0X13X6QZ&submissionId=1152921505694665183&select=Validations
         
         const windowsOptions: WindowsOptions = {
             url,
