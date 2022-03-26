@@ -1,3 +1,4 @@
+import { checkIfImageResolvesSuccesfully } from "../utils/chromium";
 import { Icon } from "./manifest";
 
 export function isIconInfos(icons: Icon[] | IconInfo[]): icons is IconInfo[] {
@@ -198,23 +199,10 @@ export class IconInfo {
     if (!this.icon.src) {
       return Promise.resolve(false);
     }
-    return new Promise((resolve) => {
-      const imageEl = new Image();
-      const imgUrl = new URL(this.icon.src, manifestUrl);
-      // imageEl.src = `${env.safeUrlFetcher}?checkExistsOnly=false&url=${encodeURIComponent(imgUrl.toString())}`;
-      imageEl.src = imgUrl.toString();
-      imageEl.onload = () => {
-        if (imageEl.complete && imageEl.naturalHeight > 0) {
-          resolve(true);
-        } else {
-          resolve(false);
-        }
-      };
-      imageEl.onerror = () => {
-        resolve(false);
-      };
-    });
+    const imgUrl = new URL(this.icon.src, manifestUrl);
+    return checkIfImageResolvesSuccesfully(imgUrl.toString());
   }
+  
   private getFileExtensionFromSrc(): string | null {
     const format = this.getFormat();
     return format?.exts[0] || null;

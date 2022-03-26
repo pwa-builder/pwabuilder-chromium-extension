@@ -1,8 +1,6 @@
 import { LitElement, html, css } from "lit";
 import {customElement, state} from 'lit/decorators.js';
-import { getManifestUrl } from "../extensionHelpers";
 import { Manifest } from "../interfaces/manifest";
-import { fetchManifest } from "../utils/manifest";
 import { classMap } from "lit/directives/class-map.js";
 
 import {
@@ -16,6 +14,7 @@ import {
 } from "@fluentui/web-components";
 
 import "@shoelace-style/shoelace/dist/components/color-picker/color-picker";
+import { getManifestInfo } from "../checks/manifest";
 
 provideFluentDesignSystem().register(
   fluentButton(),
@@ -289,10 +288,9 @@ export class ManifestDesigner extends LitElement {
   private manifest!: Manifest;
 
   async firstUpdated() {
-    const manifestUri = await getManifestUrl();
-    const manifest = await fetchManifest(manifestUri!);
-    if (manifest) {
-        this.manifest = manifest;
+    const manifestInfo = await getManifestInfo();
+    if (manifestInfo && manifestInfo.manifest) {
+        this.manifest = manifestInfo.manifest;
     }
     
     console.log('manifest', this.manifest);

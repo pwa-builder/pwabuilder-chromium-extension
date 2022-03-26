@@ -33,3 +33,15 @@ chrome.runtime.onInstalled.addListener(async () => {
 
     // test
 });
+
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+    const partnerCenterRegex = /https:\/\/partner\.microsoft\.com\/[\w-]+\/dashboard\/products\/\w+\/submissions\/\d+\/packages/g;
+    const tabs = await chrome.tabs.query({active: true, currentWindow: true});
+    for(let tab of tabs) {
+        if (tab.url && partnerCenterRegex.test(tab.url)) {
+            chrome.tabs.sendMessage(tab.id!, {urlChanged: true})
+            console.log("sending message to tab")
+        }
+    }
+});

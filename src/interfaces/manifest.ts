@@ -156,24 +156,6 @@ export interface OrganizedResults {
   optional: Array<TestResult>;
 }
 
-export interface ServiceWorkerDetectionResult {
-  hasSW: boolean;
-  url: string | null;
-  hasPushRegistration: boolean;
-  serviceWorkerDetectionTimedOut: boolean;
-  noServiceWorkerFoundDetails: string | null;
-  hasBackgroundSync: boolean;
-  hasPeriodicBackgroundSync: boolean;
-}
-
-export interface SecurityDataResults {
-  data: {
-    isHTTPS: true;
-    validProtocol: true;
-    valid: true;
-  };
-}
-
 export enum Status {
   DONE = "done",
   ACTIVE = "active",

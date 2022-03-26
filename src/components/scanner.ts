@@ -5,21 +5,32 @@ import {
   fluentButton,
   fluentAccordion,
   fluentAccordionItem,
+  fluentProgressRing
 } from "@fluentui/web-components";
 
 import "@lottiefiles/lottie-player";
 import "@shoelace-style/shoelace/dist/components/progress-ring/progress-ring";
 import "@shoelace-style/shoelace/dist/components/badge/badge";
+import "@shoelace-style/shoelace/dist/components/spinner/spinner";
 
-import { getManifestUrl } from "../extensionHelpers";
-import { fetchManifest, runManifestChecks } from "../utils/manifest";
+import { runManifestChecks } from "../utils/manifest";
 import { TestResult } from "../interfaces/manifest";
+import { testSecurity } from "../checks/security";
+import { getManifestTestResults, getSwInfo } from "../checks/sw";
+import { getManifestInfo } from "../checks/manifest";
 
 provideFluentDesignSystem().register(
   fluentButton(),
   fluentAccordion(),
-  fluentAccordionItem()
+  fluentAccordionItem(),
+  fluentProgressRing()
 );
+
+interface ValidationTests {
+  passedTests: Array<TestResult>;
+  failedTests: Array<TestResult>;
+  category: string;
+}
 
 @customElement("pwa-scanner")
 export class PWAScanner extends LitElement {
@@ -48,6 +59,9 @@ export class PWAScanner extends LitElement {
         color: red;
       }
 
+      .item-recommended {
+      }
+
       .rings {
         display: flex;
         flex-direction: row;
@@ -55,17 +69,30 @@ export class PWAScanner extends LitElement {
       }
 
       .rings pwa-scanner-ring {
-        margin: 10px;
+        margin: 10px 20px;
+      }
+      
+      .test-wrapper {
+        width: 100%;
       }
 
+      .test-header {
+        margin: 20px 0 10px 0;
+        font-size: 16px;
+      }
     `,
   ];
 
   @state()
   private currentUrl!: string;
 
-  @state()
-  private testResults!: TestResult[];
+  @state() private manifestTestResults!: ValidationTests;
+  @state() private swTestResults!: ValidationTests;
+  @state() private securityTestResults!: ValidationTests;
+
+  @state() private manifestTestsLoading: boolean = true;
+  @state() private swTestsLoading: boolean = true;
+  @state() private securityTestsLoading: boolean = true; 
 
   async firstUpdated() {
     let url = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -73,22 +100,70 @@ export class PWAScanner extends LitElement {
       this.currentUrl = url[0].url || "";
     }
 
-    const manifestUri = await getManifestUrl();
-    const manifest = await fetchManifest(manifestUri!);
+    this.runManifestChecks();
+    this.runSwChecks();
+    this.runSecurityChecks();
+  }
 
-    console.log(manifestUri, manifest);
+  private async runManifestChecks() {
+    this.manifestTestsLoading = true;
+    let manifestInfo = await getManifestInfo();
 
-    this.testResults = await runManifestChecks({
-      manifestUrl: manifestUri!,
-      initialManifest: manifest,
+    const tests = await runManifestChecks({
+      manifestUrl: manifestInfo.manifestUri!,
+      initialManifest: manifestInfo.manifest!,
       siteUrl: this.currentUrl,
       isGenerated: false,
       isEdited: false,
-      manifest,
+      manifest: manifestInfo.manifest!,
     });
 
-    console.log(this.testResults);
+    const passed = tests.filter(t => t.result);
+    const failed = tests.filter(t => !t.result);
+
+    this.manifestTestResults = {
+      passedTests: passed,
+      failedTests: failed,
+      category: "Manifest"
+    }
+
+    this.manifestTestsLoading = false;
   }
+
+  private async runSwChecks() {
+    this.swTestsLoading = true;
+    let swInfo = await getSwInfo();
+    let tests = getManifestTestResults(swInfo);
+
+    const passed = tests.filter(t => t.result);
+    const failed = tests.filter(t => !t.result);
+
+    this.swTestResults = {
+      passedTests: passed,
+      failedTests: failed,
+      category: "Service Worker"
+    }
+
+    this.swTestsLoading = false;
+  }
+
+  private async runSecurityChecks() {
+    this.securityTestsLoading = true;
+    let tests = await testSecurity(this.currentUrl);
+
+    const passed = tests.filter(t => t.result);
+    const failed = tests.filter(t => !t.result);
+
+    this.securityTestResults = {
+      passedTests: passed,
+      failedTests: failed,
+      category: "Security"
+    }
+
+    this.securityTestsLoading = false;
+  }
+
+  
 
   render() {
     return html`
@@ -96,52 +171,62 @@ export class PWAScanner extends LitElement {
         <div>Current Url = ${this.currentUrl}</div>
 
         <div class="rings">
-          <pwa-scanner-ring type="good" label="Manifest" value="75" content="15/19" ></pwa-scanner-ring>
-          <pwa-scanner-ring type="ok" label="Service Worker" value="25" content="1/4" ></pwa-scanner-ring>
-          <pwa-scanner-ring type="bad" label="Security" value="0" content="!" ></pwa-scanner-ring>
+          <pwa-scanner-ring label="Manifest" .testResults=${this.manifestTestResults} ?isLoading=${this.manifestTestsLoading} ></pwa-scanner-ring>
+          <pwa-scanner-ring label="Service Worker" .testResults=${this.swTestResults} ?isLoading=${this.swTestsLoading} ></pwa-scanner-ring>
+          <pwa-scanner-ring label="Security" .testResults=${this.securityTestResults} ?isLoading=${this.securityTestsLoading} ></pwa-scanner-ring>
         </div>
 
-        ${this.testResults && this.testResults.length > 0
-          ? html`
-              <fluent-accordion>
-                ${this.testResults.map(
-                  (result) => html`
-                    <fluent-accordion-item>
-                      <div .className=${result.result ? 'item-passed' : 'item-failed'} slot="heading">
-                        <sl-badge variant="${result.result ? 'success' : 'danger'}">${result.result ? 'Passed' : 'Failed'}</sl-badge>
-                        ${result.infoString} 
-                      </div>
-                      <div slot="panel">${result.result}</div>
-                    </fluent-accordion-item>
-                  `
-                )}
-              </fluent-accordion>
-            `
-          : html`
-              <lottie-player
-                src="https://assets5.lottiefiles.com/packages/lf20_odcijnjo.json"
-                background="transparent"
-                speed="1"
-                style="width: 150px; height: 150px;"
-                loop
-                autoplay
-              ></lottie-player>
-              <div>
-                Welcome to the best extension in the world. Are you ready to run
-                the scanner and take your PWA to the next level?
-              </div>
-              <fluent-button class="go-button" appearance="accent"
-                >Let's do it!</fluent-button
-              >
-            `}
+        ${this.renderTests(this.manifestTestsLoading, this.manifestTestResults)}
+        ${this.renderTests(this.swTestsLoading, this.swTestResults)}
+        ${this.renderTests(this.securityTestsLoading, this.securityTestResults)}
       </div>
     `;
   }
 
-  renderProgressRing(label: string, value: number, content: string, className: string) {
-    
+  renderTests(isLoading: boolean, tests: ValidationTests) {
+    if (!isLoading && tests) {
+      return html`
+        <div class="test-wrapper">
+          <div class="test-header">${tests.category}</div>
+          <fluent-accordion>
+            ${[...tests.failedTests, ...tests.passedTests].map(t => html`
+              <fluent-accordion-item>
+                <div .className=${t.result ? 'item-passed' : t.category === 'required' ? 'item-failed' : 'item-recommended'} slot="heading">
+                  <sl-badge variant="${t.result ? 'success' : t.category === 'required' ? 'danger' : 'warning'}">
+                    ${t.result ? 'Passed' : t.category === 'required' ? 'Failed' : 'Recommended'}
+                  </sl-badge>
+                  ${t.infoString} 
+                </div>
+                <div slot="panel">${t.result}</div>
+              </fluent-accordion-item>
+            `)}
+          </fluent-accordion>
+
+        </div>
+      `;
+    }
+
+    return html``;
   }
 }
+
+// html`
+// <lottie-player
+//   src="https://assets5.lottiefiles.com/packages/lf20_odcijnjo.json"
+//   background="transparent"
+//   speed="1"
+//   style="width: 150px; height: 150px;"
+//   loop
+//   autoplay
+// ></lottie-player>
+// <div>
+//   Welcome to the best extension in the world. Are you ready to run
+//   the scanner and take your PWA to the next level?
+// </div>
+// <fluent-button class="go-button" appearance="accent"
+//   >Let's do it!</fluent-button
+// >
+// `}
 
 
 @customElement("pwa-scanner-ring")
@@ -177,25 +262,56 @@ export class PWAScannerRing extends LitElement {
 
       .label {
         font-size: 16px;
+        margin-top: 10px;
+      }
+
+      .ring {
+        height: 68px;
+        width: 68px;
       }
     `
   ]
 
-  @property({type: Number}) public value: number = 0;
-  @property({type: String}) public type: "good" | "bad" | "ok" | "default" = "default";
+  // @property({type: Number}) public value: number = 0;
+  // @property({type: String}) public type: "good" | "bad" | "ok" | "default" = "default";
+  // @property({type: String}) public content: string | undefined;
   @property({type: String}) public label: string | undefined;;
-  @property({type: String}) public content: string | undefined;
+  @property({type: Boolean}) public isLoading: boolean = false;
+  @property({type: Object}) public testResults!: ValidationTests;
 
   render() {
     return html`
     <div class="root">
-      <sl-progress-ring .className=${this.type} value="${this.value}">
-        ${this.content}
-      </sl-progress-ring>
+      <div class="ring">
+        ${this.isLoading || !this.testResults ? this.renderLoading() : this.renderLoaded()}
+      </div>
       <span class="label">
         ${this.label}
       </span>
     </div>
+    `;
+  }
+
+  renderLoaded() {
+    const passed = this.testResults.passedTests.length;
+    const failed = this.testResults.failedTests.length;
+
+    const value = passed / (passed + failed);
+    let status = "good";
+
+    if (value < 0.25) status = "bad";
+    if (value < 0.5) status = "ok";
+
+    return html`
+      <sl-progress-ring .className=${status} value="${value * 100}">
+        ${passed}/${passed + failed}
+      </sl-progress-ring>
+    `;
+  }
+
+  renderLoading() {
+    return html`
+      <sl-spinner style="font-size: 4rem;"></sl-spinner>
     `;
   }
 
