@@ -1,10 +1,11 @@
+import { TestResult } from "../interfaces/manifest";
 import { ManifestDetectionResult, ServiceWorkerDetectionResult, SiteData } from "../interfaces/validation";
 import { getTabId } from "../utils/chromium";
 
-let getServiceWorkerInfoPromise: Promise<SiteData>;
+let getServiceWorkerInfoPromise: Promise<ServiceWorkerDetectionResult>;
 const messageType = 'serviceWorkerMessage';
 
-export function getSwInfo() : Promise<SiteData> {
+export function getSwInfo() : Promise<ServiceWorkerDetectionResult> {
     if (getServiceWorkerInfoPromise) {
         return getServiceWorkerInfoPromise;
     }
@@ -140,4 +141,34 @@ function runContentScriptIsolated(messageType: string) {
 
     window.addEventListener("message", callback)
     return true;
+}
+
+export function getManifestTestResults(swInfo: ServiceWorkerDetectionResult) : TestResult[] {
+    return [
+        {
+            result: swInfo.hasSW || false,
+            infoString: "Has a registered service worker",
+            category: "required",
+        },
+        {
+            result: swInfo.hasPushRegistration || false,
+            infoString: "Has push notification registration",
+            category: "recommended",
+        },
+        {
+            result: swInfo.hasBackgroundSync || false,
+            infoString: "Has background sync",
+            category: "recommended",
+        },
+        {
+            result: swInfo.hasPeriodicBackgroundSync || false,
+            infoString: "Has periodic background sync",
+            category: "recommended",
+        },
+        {
+            result: swInfo.isHtmlInCache || false,
+            infoString: "Has cached HTML",
+            category: "recommended",
+        },
+    ];
 }
