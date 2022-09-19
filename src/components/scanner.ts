@@ -92,7 +92,7 @@ export class PWAScanner extends LitElement {
 
   @state() private manifestTestsLoading: boolean = true;
   @state() private swTestsLoading: boolean = true;
-  @state() private securityTestsLoading: boolean = true; 
+  @state() private securityTestsLoading: boolean = true;
 
   async firstUpdated() {
     let url = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -108,6 +108,9 @@ export class PWAScanner extends LitElement {
   private async runManifestChecks() {
     this.manifestTestsLoading = true;
     let manifestInfo = await getManifestInfo();
+
+    console.log('manifestInfo', manifestInfo);
+
 
     const tests = await runManifestChecks({
       manifestUrl: manifestInfo.manifestUri!,
@@ -129,7 +132,10 @@ export class PWAScanner extends LitElement {
       category: "Manifest"
     }
 
+    console.log("here");
     this.manifestTestsLoading = false;
+
+
   }
 
   private async runSwChecks() {
@@ -165,19 +171,22 @@ export class PWAScanner extends LitElement {
     this.securityTestsLoading = false;
   }
 
-  
+
 
   render() {
     return html`
       <div class="root">
         <div>Current Url = ${this.currentUrl}</div>
-
+      
         <div class="rings">
-          <pwa-scanner-ring label="Manifest" .testResults=${this.manifestTestResults} ?isLoading=${this.manifestTestsLoading} ></pwa-scanner-ring>
-          <pwa-scanner-ring label="Service Worker" .testResults=${this.swTestResults} ?isLoading=${this.swTestsLoading} ></pwa-scanner-ring>
-          <pwa-scanner-ring label="Security" .testResults=${this.securityTestResults} ?isLoading=${this.securityTestsLoading} ></pwa-scanner-ring>
+          <pwa-scanner-ring label="Manifest" .testResults=${this.manifestTestResults} ?isLoading=${this.manifestTestsLoading}>
+          </pwa-scanner-ring>
+          <pwa-scanner-ring label="Service Worker" .testResults=${this.swTestResults} ?isLoading=${this.swTestsLoading}>
+          </pwa-scanner-ring>
+          <pwa-scanner-ring label="Security" .testResults=${this.securityTestResults} ?isLoading=${this.securityTestsLoading}>
+          </pwa-scanner-ring>
         </div>
-
+      
         ${this.renderTests(this.manifestTestsLoading, this.manifestTestResults)}
         ${this.renderTests(this.swTestsLoading, this.swTestResults)}
         ${this.renderTests(this.securityTestsLoading, this.securityTestResults)}
@@ -192,18 +201,19 @@ export class PWAScanner extends LitElement {
           <div class="test-header">${tests.category}</div>
           <fluent-accordion>
             ${[...tests.failedTests, ...tests.passedTests].map(t => html`
-              <fluent-accordion-item>
-                <div .className=${t.result ? 'item-passed' : t.category === 'required' ? 'item-failed' : 'item-recommended'} slot="heading">
-                  <sl-badge variant="${t.result ? 'success' : t.category === 'required' ? 'danger' : 'warning'}">
-                    ${t.result ? 'Passed' : t.category === 'required' ? 'Failed' : 'Recommended'}
-                  </sl-badge>
-                  ${t.infoString} 
-                </div>
-                <div class="panel">${(t as any).description}</div>
-              </fluent-accordion-item>
+            <fluent-accordion-item>
+              <div .className=${t.result ? 'item-passed' : t.category==='required' ? 'item-failed' : 'item-recommended' }
+                slot="heading">
+                <sl-badge variant="${t.result ? 'success' : t.category === 'required' ? 'danger' : 'warning'}">
+                  ${t.result ? 'Passed' : t.category === 'required' ? 'Failed' : 'Recommended'}
+                </sl-badge>
+                ${t.infoString}
+              </div>
+              <div class="panel">${(t as any).description}</div>
+            </fluent-accordion-item>
             `)}
           </fluent-accordion>
-
+        
         </div>
       `;
     }
@@ -277,9 +287,9 @@ export class PWAScannerRing extends LitElement {
   // @property({type: Number}) public value: number = 0;
   // @property({type: String}) public type: "good" | "bad" | "ok" | "default" = "default";
   // @property({type: String}) public content: string | undefined;
-  @property({type: String}) public label: string | undefined;;
-  @property({type: Boolean}) public isLoading: boolean = false;
-  @property({type: Object}) public testResults!: ValidationTests;
+  @property({ type: String }) public label: string | undefined;;
+  @property({ type: Boolean }) public isLoading: boolean = false;
+  @property({ type: Object }) public testResults!: ValidationTests;
 
   render() {
     return html`

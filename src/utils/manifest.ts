@@ -113,19 +113,9 @@ const default_results: any[] = [
 export async function runManifestChecks(
   context: ManifestContext
 ): Promise<Array<TestResult>> {
-  if (context.isGenerated === true) {
+  if (context.isGenerated === true || !context.manifest) {
     return default_results;
   } else {
-    // go ahead and try to find mainIcon
-    // so we can use it for the below check
-    const mainIcon = findBestAppIcon(context.manifest.icons);
-    const mainIconInfo = mainIcon ? new IconInfo(mainIcon) : null;
-
-    // checking if the icon can be succesfully loaded
-    const iconCanBeLoaded = mainIconInfo
-      ? await mainIconInfo.resolvesSuccessfully(context.manifestUrl)
-      : false;
-
     const manifestTests: Validation[] = await validateManifest((context.manifest as any));
     console.log("manifestTests", manifestTests);
 
