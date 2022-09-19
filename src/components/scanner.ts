@@ -199,7 +199,7 @@ export class PWAScanner extends LitElement {
                   </sl-badge>
                   ${t.infoString} 
                 </div>
-                <div slot="panel">${t.result}</div>
+                <div class="panel">${(t as any).description}</div>
               </fluent-accordion-item>
             `)}
           </fluent-accordion>

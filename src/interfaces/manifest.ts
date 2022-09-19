@@ -148,6 +148,7 @@ export interface TestResult {
   infoString: string;
   result: boolean;
   category: string;
+  description?: string;
 }
 
 export interface OrganizedResults {

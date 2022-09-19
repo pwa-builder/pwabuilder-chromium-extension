@@ -138,6 +138,8 @@ export async function runManifestChecks(
           infoString: manifestTests[i].displayString,
           result: manifestTests[i].valid,
           category: manifestTests[i].category,
+          description: manifestTests[i].infoString,
+          errorString: manifestTests[i].errorString
         }
       )
     };
