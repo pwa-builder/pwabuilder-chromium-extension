@@ -118,6 +118,8 @@ export class PWAScanner extends LitElement {
       manifest: manifestInfo.manifest!,
     });
 
+    console.log('tests', tests);
+
     const passed = tests.filter(t => t.result);
     const failed = tests.filter(t => !t.result);
 
