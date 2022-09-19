@@ -117,7 +117,6 @@ export async function runManifestChecks(
     return default_results;
   } else {
     const manifestTests: Validation[] = await validateManifest((context.manifest as any));
-    console.log("manifestTests", manifestTests);
 
     let results = [];
 

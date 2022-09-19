@@ -109,9 +109,6 @@ export class PWAScanner extends LitElement {
     this.manifestTestsLoading = true;
     let manifestInfo = await getManifestInfo();
 
-    console.log('manifestInfo', manifestInfo);
-
-
     const tests = await runManifestChecks({
       manifestUrl: manifestInfo.manifestUri!,
       initialManifest: manifestInfo.manifest!,
@@ -121,7 +118,6 @@ export class PWAScanner extends LitElement {
       manifest: manifestInfo.manifest!,
     });
 
-    console.log('tests', tests);
 
     const passed = tests.filter(t => t.result);
     const failed = tests.filter(t => !t.result);
@@ -132,7 +128,6 @@ export class PWAScanner extends LitElement {
       category: "Manifest"
     }
 
-    console.log("here");
     this.manifestTestsLoading = false;
 
 
