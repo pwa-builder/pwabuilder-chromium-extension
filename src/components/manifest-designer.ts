@@ -293,8 +293,6 @@ export class ManifestDesigner extends LitElement {
         this.manifest = manifestInfo.manifest;
     }
     
-    console.log('manifest', this.manifest);
-    
   }
   
   render() {
