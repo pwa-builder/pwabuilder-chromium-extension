@@ -1,4 +1,7 @@
+This project can now be found in our [monorepo](https://github.com/pwa-builder/PWABuilder)
+
 # pwabuilder-chromium-extension
+
 Hackathon Project - An experiment, not officially supported.... for now 😊
 
 ## Build the extension
